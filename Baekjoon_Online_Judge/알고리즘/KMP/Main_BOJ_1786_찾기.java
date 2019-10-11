@@ -1,0 +1,105 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
+
+public class Main { // 제출일 2019-10-11 18:06
+
+	static ArrayList<Integer> answer;
+	static String T;
+	static String P;
+	static int n;
+	static int m;
+	static int[] pi;
+
+	public static void main(String[] args) throws Exception {
+		// TODO Auto-generated method stub
+		sc.init();
+		answer = new ArrayList<>();
+		T = sc.readLine();
+		P = sc.readLine();
+		n = T.length();
+		m = P.length();
+		// 입력 종료
+		// T의 i～i+m-1번 문자와 P의 1～m번 문자가 차례로 일치한다면, i를 출력
+
+		kmp(T, P);
+
+		// 답 출력
+		StringBuilder sb = new StringBuilder();
+		sb.append(answer.size()).append("\n");
+		for (int i = 0; i < answer.size(); i++) {
+			sb.append(answer.get(i)).append(" ");
+		}
+		System.out.println(sb.toString());
+	}
+
+	private static void kmp(String t, String p) {
+		answer = new ArrayList<Integer>();
+		getPi(p);
+		int j = 0;
+		for (int i = 0; i < n; i++) {
+			while (j > 0 && t.charAt(i) != p.charAt(j))
+				j = pi[j - 1];
+			if (t.charAt(i) == p.charAt(j)) {
+				if (j == m - 1) {
+					answer.add(i - m + 2);
+					j = pi[j];
+				} else {
+					j++;
+				}
+			}
+		}
+	}
+
+	static void getPi(String p) {
+		int j = 0;
+		pi = new int[m];
+		// System.out.println("here");
+		for (int i = 1; i < m; i++) {
+			while (j > 0 && p.charAt(i) != p.charAt(j)) {
+				j = pi[j - 1];
+			}
+			if (p.charAt(i) == p.charAt(j)) {
+				pi[i] = ++j;
+			}
+		}
+	}
+
+	static class sc {
+		private static BufferedReader br;
+		private static StringTokenizer st;
+
+		static void init() {
+			br = new BufferedReader(new InputStreamReader(System.in));
+			st = new StringTokenizer(" ");
+		}
+
+		static String readLine() {
+			try {
+				return br.readLine();
+			} catch (IOException e) {
+			}
+			return null;
+		}
+
+		static String next() {
+			while (!st.hasMoreTokens()) {
+				try {
+					st = new StringTokenizer(br.readLine());
+				} catch (IOException e) {
+				}
+			}
+			return st.nextToken();
+		}
+
+		static int nextInt() {
+			return Integer.parseInt(next());
+		}
+
+		static long nextLong() {
+			return Long.parseLong(next());
+		}
+	}
+}
