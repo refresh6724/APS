@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class Solution { // _D2_1959_두개의 숫자열 제출일 2020-01-02 23:38
+public class Solution_D2_1959_두개의 숫자열 { // 제출일 2020-01-02 23:49
 
 	public static void main(String[] args) {
 		Scanner sc = new Scanner(System.in);
@@ -38,9 +38,7 @@ public class Solution { // _D2_1959_두개의 숫자열 제출일 2020-01-02 23:
 				for(int i=0; i<m; i++) {
 					base[i] = B[i];					
 				}
-				for(int i=0; i<=m-n; i++) {
-					// 계산
-					if(gap > max) max = gap;
+				for(int i=0; i<=m-n; i++) {			
 					
 					// 초기화
 					gap = 0;
@@ -57,6 +55,10 @@ public class Solution { // _D2_1959_두개의 숫자열 제출일 2020-01-02 23:
 					for(int j=0; j<m; j++) {
 						gap += base[j] * mul[j];
 					}
+					
+					// 계산
+					if(gap > max) max = gap;
+					
 				}
 				
 			} else if(n>m){
@@ -64,8 +66,7 @@ public class Solution { // _D2_1959_두개의 숫자열 제출일 2020-01-02 23:
 					base[i] = A[i];
 				}
 				for(int i=0; i<=n-m; i++) {
-					// 계산
-					if(gap > max) max = gap;
+					
 					
 					// 초기화
 					gap = 0;
@@ -82,6 +83,9 @@ public class Solution { // _D2_1959_두개의 숫자열 제출일 2020-01-02 23:
 					for(int j=0; j<n; j++) {
 						gap += base[j] * mul[j];
 					}
+					
+					// 계산
+					if(gap > max) max = gap;
 				}
 				
 			} else {
