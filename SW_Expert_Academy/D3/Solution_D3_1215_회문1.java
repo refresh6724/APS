@@ -1,49 +1,64 @@
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.StringTokenizer;
+// 기존 제출일 2019-07-19 18:48 20,012 kb 139 ms
+// 신규 제출일 2020-04-26 23:16 16,088 kb 98 ms
+public class Solution_D3_1215_회문1 {
+	static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+	static StringTokenizer st = null;
+	static StringBuilder sb = new StringBuilder();
 
-public class Solution_D3_1215_회문1 { // 제출일 2019-07-19 18:48
+	static char[][] input;
+	static int ans;
 
-	static int Answer = 0;
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		Scanner sc = new Scanner(System.in);
-		for(int t=1; t<=10; t++) {
-			Answer = 0;
-			
-			int len = Integer.parseInt(sc.nextLine());
-			char[][] map = new char[8][8];
-			for(int i=0; i<8; i++) {
-				String[] str = new String[8];
-				str[i] = sc.nextLine();
-				for(int j=0; j<8; j++) {
-					map[i][j] = str[i].charAt(j);
+	public static void main(String[] args) throws Exception {
+
+//		int TC = Integer.parseInt(br.readLine());
+
+		for (int tc = 1; tc <= 10; tc++) {
+
+			int len = Integer.parseInt(br.readLine());
+
+			input = new char[8][8];
+			for (int i = 0; i < 8; i++) {
+				input[i] = br.readLine().toCharArray();
+			}
+			ans = 0;
+			// 8 * 8 에서 가로 세로
+			// 8-len 위치까지 검색
+			// 예를 들어 2글자 5글자일 경우 0위치, 1위치, 2위치, 3위치까지 보고 4위치는 ㄴㄴ
+			for (int i = 0; i < 8; i++) {
+				for (int start = 0; start <= 8 - len; start++) {
+					isRowPalindrome(i, start, start + len - 1);
+					isColPalindrome(i, start, start + len - 1);
 				}
 			}
-			
-			// 행 검색
-			for(int i=0; i<8; i++) {
-				nextRow:
-				for(int j=0; j<8; j++) {
-					if(j+len>8) break;					
-					for(int l=0; l<len/2; l++) {
-						if(map[i][j+l] != map[i][j+len-1-l]) continue nextRow;						
-					}
-					Answer++;
-				}
-			}
-			// 열 검색
-			for(int j=0; j<8; j++) {
-				nextCol: 
-				for (int i = 0; i < 8; i++) {
-					if (i + len > 8) break;
-					for (int l = 0; l < len / 2; l++) {
-						if (map[i+l][j] != map[i+len-1-l][j]) continue nextCol;
-					}
-					Answer++;
-				}
-			}
-			
-			System.out.println("#"+t+" "+Answer);
+			sb.append("#").append(tc).append(" ").append(ans).append(" ").append("\n");
 		}
+		bw.write(sb.toString());
+		bw.flush();
+
+	}
+
+	private static void isRowPalindrome(int i, int left, int right) {
+		while (left < right) {
+			if (input[i][left++] != input[i][right--]) {
+				return;
+			}
+		}
+		ans++;
+	}
+
+	private static void isColPalindrome(int i, int left, int right) {
+		while (left < right) {
+			if (input[left++][i] != input[right--][i]) {
+				return;
+			}
+		}
+		ans++;
 	}
 
 }
