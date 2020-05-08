@@ -1,144 +1,87 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
 import java.util.StringTokenizer;
 
-public class Solution_D6_8051_유산 { // 제출일 2019-08-28 11:58
+// 기존 제출일 2019-08-28 11:58 37,932 kb 3,472 ms
+// 개선 제출일 2020-05-09 01:13 24,584 kb 2,901 ms
+public class Solution_D6_8051_유산 {
 
-	static class Node {
-		long space;
-		long price;
+	static long[][] info;
+	static final int SPACE = 0;
+	static final int PRICE = 1;
+	static int N;
+	static long answer, D, tS, tP, dS, dP; // total, diff
 
-		public long getSpace() {
-			return space;
+	public static void main(String[] args) throws Exception {
+
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		StringTokenizer st = null;
+		StringBuilder sb = new StringBuilder();
+
+		int TC = Integer.parseInt(br.readLine());
+		for (int tc = 1; tc <= TC; tc++) {
+			answer = 0;
+			st = new StringTokenizer(br.readLine());
+			N = Integer.parseInt(st.nextToken());
+			D = Long.parseLong(st.nextToken());
+			tS = 0; // total space
+			tP = 0; // total price
+			info = new long[N][2];
+			for (int i = 0; i < N; i++) {
+				st = new StringTokenizer(br.readLine());
+				info[i][SPACE] = Long.parseLong(st.nextToken());
+				info[i][PRICE] = Long.parseLong(st.nextToken());
+				tS += info[i][SPACE];
+				tP += info[i][PRICE];
+			}
+
+			Arrays.sort(info, new Comparator<long[]>() {
+				@Override
+				public int compare(long[] o1, long[] o2) {
+					return Long.compare(o2[0], o1[0]);
+				}
+			});
+			dfs(0, 0, 0, 0, 0, tS, tP);
+			sb.append("#").append(tc).append(" ").append(answer).append("\n");
 		}
-
-		public long getPrice() {
-			return price;
-		}
-
-		public Node(long space, long price) {
-			this.space = space;
-			this.price = price;
-		}
-
-		@Override
-		public String toString() {
-			StringBuilder builder = new StringBuilder();
-			builder.append("Node [space=").append(space).append(", price=").append(price).append("]");
-			return builder.toString();
-		}
+		bw.write(sb.toString());
+		bw.flush();
 
 	}
 
-	static List<Node> info;
-
-	static BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-	static long answer;
-	static int N = 0;
-	static long D = 0;
-	static long SL = 0; // space limit
-	static long PL = 0;
-
-	public static void main(String[] args) throws Exception {
-		// TODO Auto-generated method stub
-		sc.init();
-		// 테스트케이스
-		int TC = sc.nextInt();
-		for (int tc = 1; tc <= TC; tc++) {
-			answer = 0;
-			N = sc.nextInt();
-			D = sc.nextLong();
-			long TS = 0; // Total space
-			long TP = 0; // total price
-			info = new ArrayList<Node>(N);
-			for (int i = 0; i < N; i++) {
-				info.add(new Node(sc.nextLong(), sc.nextLong()));
-				TS += info.get(i).space;
-				TP += info.get(i).price;
-			}
-			// 넓이 내림차순 가치 오름차순
-			info.sort(Comparator.comparing(Node::getSpace).reversed().thenComparing(Node::getPrice));
-			// 디버그
-			// System.out.println(info.toString());
-
-			long HoSpace = 0;
-			long HoPrice = 0;
-			long DaSpace = 0;
-			long DaPrice = 0;
-
-			dfs(0, HoSpace, HoPrice, DaSpace, DaPrice, TS, TP);
-
-			bw.write(String.format("#%d %d\n", tc, answer));
-			bw.flush();
+	private static void dfs(int idx, long hoS, long hoP, long daS, long daP, long rS, long rP) { // rest
+		dS = hoS - daS;
+		dP = hoP - daP;
+		if (idx == N) {
+			if (abs(dS) > D || dP < 0)
+				return;
+			ans(dP);
+			return;
 		}
+		if (dP + rP < 0 || abs(dS) > rS + D || answer > rP + dP)
+			return;
 
+		rS -= info[idx][SPACE];
+		rP -= info[idx][PRICE];
+
+		dfs(idx + 1, hoS + info[idx][SPACE], hoP + info[idx][PRICE], daS, daP, rS, rP);
+		dfs(idx + 1, hoS, hoP, daS + info[idx][SPACE], daP + info[idx][PRICE], rS, rP);
+		dfs(idx + 1, hoS, hoP, daS, daP, rS, rP);
 	}
 
 	private static long abs(long a) {
 		return a > 0 ? a : (-a);
 	}
 
-	private static void dfs(int idx, long hoSpace, long hoPrice, long daSpace, long daPrice, long tS, long tP) {
-		if (idx == N) {
-			if (abs(hoSpace - daSpace) > D || hoPrice < daPrice)
-				return;
-			answer = answer > (hoPrice - daPrice) ? answer : (hoPrice - daPrice);
-			return;
-		}
-		if (hoPrice + tP < daPrice || abs(hoSpace - daSpace) > tS + D || answer > tP + hoPrice - daPrice)
-			return;
-
-		tS -= info.get(idx).space;
-		tP -= info.get(idx).price;
-
-		dfs(idx + 1, hoSpace + info.get(idx).space, hoPrice + info.get(idx).price, daSpace, daPrice, tS, tP);
-		dfs(idx + 1, hoSpace, hoPrice, daSpace + info.get(idx).space, daPrice + info.get(idx).price, tS, tP);
-		dfs(idx + 1, hoSpace, hoPrice, daSpace, daPrice, tS, tP);
-
-	}
-
-	static class sc {
-		private static BufferedReader br;
-		private static StringTokenizer st;
-
-		static void init() throws Exception {
-			// System.setIn(new FileInputStream("input.txt"));// 테스트케이스 파일을 프로젝트 폴더에 삽입
-			br = new BufferedReader(new InputStreamReader(System.in));
-			st = new StringTokenizer(" ");
-		}
-
-		static String readLine() {
-			try {
-				return br.readLine();
-			} catch (IOException e) {
-			}
-			return null;
-		}
-
-		static String next() {
-			while (!st.hasMoreTokens()) {
-				try {
-					st = new StringTokenizer(br.readLine());
-				} catch (IOException e) {
-				}
-			}
-			return st.nextToken();
-
-		}
-
-		static int nextInt() {
-			return Integer.parseInt(next());
-		}
-
-		static long nextLong() {
-			return Long.parseLong(next());
+	private static void ans(long dp) {
+		if (answer < dp) {
+			answer = dp;
 		}
 	}
+
 }
