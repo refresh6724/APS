@@ -4,7 +4,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.StringTokenizer;
 
-public class Solution_D3_7102_준홍이의카드놀이 { // 제출일 2020-05-10 23:03 20,064 kb 119 ms
+// 기존 제출일 2020-05-10 23:03 20,064 kb 119 ms
+// 개선 제출일 2020-05-10 23:11 19,460 kb 111 ms
+public class Solution_D3_7102_준홍이의카드놀이 {
 
 	public static void main(String[] args) throws Exception {
 
@@ -22,23 +24,12 @@ public class Solution_D3_7102_준홍이의카드놀이 { // 제출일 2020-05-10
 
 			int n = Integer.parseInt(st.nextToken());
 			int m = Integer.parseInt(st.nextToken());
-
-			int[] arr = new int[n + m + 1];
-			for (int i = 1; i <= n; i++) {
-				for (int j = 1; j <= m; j++) {
-					arr[i + j]++;
+			if (n > m) {
+				for (int i = m + 1; i <= n + 1; i++) {
+					sb.append(" ").append(i);
 				}
-			}
-
-			int max = 0;
-			for (int i = 2; i < n + m + 1; i++) {
-				if (max < arr[i]) {
-					max = arr[i];
-				}
-			}
-
-			for (int i = 2; i < n + m + 1; i++) {
-				if (max == arr[i]) {
+			} else {
+				for (int i = n + 1; i <= m + 1; i++) {
 					sb.append(" ").append(i);
 				}
 			}
