@@ -1,13 +1,14 @@
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
+
 // 최초 제출일 2020-05-25 16:27 283560 kb 4204 ms
 // 2차 제출일 2020-05-26 23:47 283772 kb 4316 ms 
-// 3차 제출일 2020-05-27 00:30 282916 kb 1696 ms
+// 3차 제출일 2020-05-27 00:30 282916 kb 1696 ms 
+// 4차 제출일 2020-05-27 00:34 281316 kb 764 ms
 
 public class Main {
 
@@ -63,7 +64,6 @@ public class Main {
 
 	static int N, M, G, R, Y, max, flower;
 	static int[][] map, bmap;
-//	static int[][] rmap, gmap, fmap;
 	static ArrayList<Node> Yellow;
 
 	static class Node {
@@ -99,12 +99,6 @@ public class Main {
 			}
 		}
 		
-		// debug
-//		for (int i = 0; i < N+2; i++) {
-//			System.out.println(Arrays.toString(map[i]));			
-//		}
-//		System.out.println();
-
 		// 1단계 dfs
 		Y = Yellow.size();
 		seedOrder = new char[Y];
@@ -122,8 +116,6 @@ public class Main {
 			// 2단계 bfs
 			bmap = new int[N + 2][M + 2];
 			mapclone();
-//			System.out.println("red : "+red + " green : "+green);
-//			System.out.println(Arrays.toString(seedOrder));
 			bfs();
 			return;
 		}
@@ -155,11 +147,8 @@ public class Main {
 	static int[] dc = { 0, 0, -1, 1 };
 
 	private static void bfs() {
-		// bmap에서 0은 호수, 1은 통과 가능, 2를 green으로 간주하고 같은 턴에 red가 뿌려질때 2라면 f++ 하고 0으로 변경
+		// bmap에서 0은 호수, 1은 통과 가능, 2를 green으로 간주하고 같은 턴에 red가 뿌려질때 2라면 f++ 하고 4로 변경
 		flower = 0;
-//		fmap = new int[N+2][M+2];
-//		rmap = new int[N+2][M+2];
-//		gmap = new int[N+2][M+2];
 		// 다음턴에 사방탐색을 해야하는 배양액 위치
 		rq = new LinkedList<Node>();
 		gq = new LinkedList<Node>();
@@ -177,8 +166,6 @@ public class Main {
 			}
 		}
 
-		//
-//		int thisTurn = 1;
 		while (!rq.isEmpty() && !gq.isEmpty()) { // rq가 비어있지 않아야 하고 && gq도 비어있지 않아야 한다
 
 			int rsize = rq.size();
@@ -187,13 +174,11 @@ public class Main {
 			for (int gs = 0; gs < gsize; gs++) {
 				Node node = gq.poll();
 				int r = node.r;
-				int c = node.c;
-//				if (fmap[r][c] != 0) {
-//					continue;
-//				}
+				int c = node.c;	
 				if(bmap[r][c] == 4) {
 					continue; // 뿌려진곳에 꽃이 피었다면 스킵
 				}
+				bmap[r][c] = 0; // 이전에 배양액이 뿌려진 곳을 0처리
 				int nr = 0;
 				int nc = 0;
 				// 사방 탐색
@@ -204,10 +189,6 @@ public class Main {
 						bmap[nr][nc] = 2;
 						gq.add(new Node(nr, nc));
 					}
-//					if (nr >= 0 && nc >= 0 && nr < N && nc < M && bmap[nr][nc] != 0 // bmap이 호수나 꽃이 아니어야 하고
-//							&& gmap[nr][nc] == 0) { // 이전에 방문한 적이 없어야 한다.
-//						gmap[nr][nc] = thisTurn; // 방문 시각을 기록한다
-//					}
 				}
 			}
 
@@ -215,60 +196,22 @@ public class Main {
 				Node node = rq.poll();
 				int r = node.r;
 				int c = node.c;
-//				if (fmap[r][c] != 0) {
-//					continue;
-//				}
 				int nr = 0;
 				int nc = 0;
 				// 사방 탐색
 				for (int i = 0; i < 4; i++) {
 					nr = r + dr[i];
 					nc = c + dc[i];
-					if (bmap[nr][nc] == 1) {// 0이면 호수고 1이면 red 뿌리기 2라면 꽃이 핀다
+					if (bmap[nr][nc] == 1) {// 0이면 호수고 1이면 red 뿌리기 2라면 꽃이 핀다 4
 						bmap[nr][nc] = 0;
 						rq.add(new Node(nr, nc));
 					} else if (bmap[nr][nc] == 2) {
 						bmap[nr][nc] = 4;
 						flower++;
 					}
-//					if (nr >= 0 && nc >= 0 && nr < N && nc < M && bmap[nr][nc] != 0 // 다음 방문 장소가 호수나 꽃이 아니어야 하고
-//							&& rmap[nr][nc] == 0) { // 기존에 방문한 적이 없어야 한다
-//						rmap[nr][nc] = thisTurn; // 방문시간을 기록하고
-//						if (gmap[nr][nc] == thisTurn) { // 만약 green이 같은 시간에 뿌려졌을때
-//							if (fmap[nr][nc] == 0) { // 꽃이 핀적이 없는 장소라면
-//								fmap[nr][nc] = 1; // 꽃을 피운다
-//								flower++;
-//							}
-//						} else {
-//							rq.add(new Node(nr, nc)); // green과 연관이 없다면 새로운 전파장소로 등록한다
-//						}
-//					}
 				}
 			}
-
-			for (int i = 1; i <= N; i++) {
-				for (int j = 1; j <= M; j++) {
-					if (bmap[i][j] == 2) { // 남은 green이 뿌려진 장소
-						bmap[i][j] = 0;
-					}
-//					if (gmap[i][j] == thisTurn) {
-//						gq.add(new Node(i, j));
-//					}
-				}
-			}
-
-//			thisTurn++;
 		}
-//		System.out.println();
-//		System.out.println("flower : " + flower);
-//		for (int i = 0; i < N+2; i++) {
-//			System.out.println(Arrays.toString(bmap[i]));			
-//		}
-//		System.out.println();
-//		
-//		if(flower == 6) {
-//			System.exit(0);
-//		}
 
 		if (max < flower) {
 			max = flower;
