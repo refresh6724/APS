@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -6,7 +7,61 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.StringTokenizer;
 
-public class Main_BOJ_18809_Gaaaaaaaaaarden { // 제출일 2020-05-25 16:27 283560 kb 4204 ms
+// 최초 제출일 2020-05-25 16:27 283560 kb 4204 ms
+// 2차 제출일 2020-05-26 23:47 283772 kb 4316 ms 
+
+public class Main {
+	
+	/**
+	 * https://www.geeksforgeeks.org/fast-io-in-java-in-competitive-programming/
+	 */
+	static class Reader {
+		final private int BUFFER_SIZE = 1 << 16;
+		private DataInputStream din;
+		private byte[] buffer;
+		private int bufferPointer, bytesRead;
+
+		public Reader() {
+			din = new DataInputStream(System.in);
+			buffer = new byte[BUFFER_SIZE];
+			bufferPointer = bytesRead = 0;
+		}
+
+		public String readLine() throws IOException {
+			byte[] buf = new byte[64]; // line length
+			int cnt = 0, c;
+			while ((c = read()) != -1) {
+				if (c == '\n')
+					break;
+				buf[cnt++] = (byte) c;
+			}
+			return new String(buf, 0, cnt);
+		}
+
+		public int nextInt() throws IOException {
+			int ret = 0;
+			byte c = read();
+			while (c <= ' ')
+				c = read();
+			do {
+				ret = ret * 10 + c - '0';
+			} while ((c = read()) >= '0' && c <= '9');
+			return ret;
+		}
+
+		private void fillBuffer() throws IOException {
+			bytesRead = din.read(buffer, bufferPointer = 0, BUFFER_SIZE);
+			if (bytesRead == -1)
+				buffer[0] = -1;
+		}
+
+		private byte read() throws IOException {
+			if (bufferPointer == bytesRead)
+				fillBuffer();
+			return buffer[bufferPointer++];
+		}
+	}
+
 
 	static int N, M, G, R, Y, max, flower;
 	static int[][] map, bmap, rmap, gmap, fmap;
@@ -15,39 +70,28 @@ public class Main_BOJ_18809_Gaaaaaaaaaarden { // 제출일 2020-05-25 16:27 2835
 	static class Node {
 		int r;
 		int c;
-		char redOrGreen;
 
 		public Node(int r, int c) {
 			super();
 			this.r = r;
 			this.c = c;
 		}
-
-		public Node(int r, int c, char redOrGreen) {
-			super();
-			this.r = r;
-			this.c = c;
-			this.redOrGreen = redOrGreen;
-		}
-
 	}
 
 	public static void main(String[] args) throws IOException {
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine());
+		Reader s = new Reader();
 		// 첫쨰줄
-		N = Integer.parseInt(st.nextToken());
-		M = Integer.parseInt(st.nextToken());
-		G = Integer.parseInt(st.nextToken());
-		R = Integer.parseInt(st.nextToken());
+		N = s.nextInt();
+		M = s.nextInt();
+		G = s.nextInt();
+		R = s.nextInt();
 
 		Yellow = new ArrayList<>();
 
 		map = new int[N][M];
-		for (int i = 0; i < N; i++) { // row
-			st = new StringTokenizer(br.readLine());
+		for (int i = 0; i < N; i++) { // row			
 			for (int j = 0; j < M; j++) { // col
-				int a = Integer.parseInt(st.nextToken());
+				int a = s.nextInt();
 				map[i][j] = a;
 				if (a == 2) {
 					Yellow.add(new Node(i, j)); // row, col
@@ -75,16 +119,7 @@ public class Main_BOJ_18809_Gaaaaaaaaaarden { // 제출일 2020-05-25 16:27 2835
 			bfs();
 			return;
 		}
-		if (idx == Y) {			
-			return;
-		}
-		if (red > R) {
-			return;
-		}
-		if (green > G) {
-			return;
-		}
-		if (Y - idx < 남은개수) { // 남은개수 == (R - red) + (G - green)
+		if (idx == Y || idx > Y - 남은개수 || red > R || green > G) {// 남은개수 == (R - red) + (G - green)
 			return;
 		}
 
@@ -136,15 +171,15 @@ public class Main_BOJ_18809_Gaaaaaaaaaarden { // 제출일 2020-05-25 16:27 2835
 		//
 		int thisTurn = 1;
 		while (!rq.isEmpty() && !gq.isEmpty()) { // rq가 비어있지 않아야 하고 && gq도 비어있지 않아야 한다
-			
+
 			int rsize = rq.size();
-			int gsize = gq.size();			
+			int gsize = gq.size();
 
 			for (int gs = 0; gs < gsize; gs++) {
 				Node node = gq.poll();
 				int r = node.r;
 				int c = node.c;
-				if(fmap[r][c] != 0) {
+				if (fmap[r][c] != 0) {
 					continue;
 				}
 				int nr = 0;
@@ -153,8 +188,7 @@ public class Main_BOJ_18809_Gaaaaaaaaaarden { // 제출일 2020-05-25 16:27 2835
 				for (int i = 0; i < 4; i++) {
 					nr = r + dr[i];
 					nc = c + dc[i];
-					if (nr >= 0 && nc >= 0 && nr < N && nc < M 
-							&& bmap[nr][nc] != 0  // bmap이 호수나 꽃이 아니어야 하고
+					if (nr >= 0 && nc >= 0 && nr < N && nc < M && bmap[nr][nc] != 0 // bmap이 호수나 꽃이 아니어야 하고
 							&& gmap[nr][nc] == 0) { // 이전에 방문한 적이 없어야 한다.
 						gmap[nr][nc] = thisTurn; // 방문 시각을 기록한다
 					}
@@ -165,7 +199,7 @@ public class Main_BOJ_18809_Gaaaaaaaaaarden { // 제출일 2020-05-25 16:27 2835
 				Node node = rq.poll();
 				int r = node.r;
 				int c = node.c;
-				if(fmap[r][c] != 0) {
+				if (fmap[r][c] != 0) {
 					continue;
 				}
 				int nr = 0;
@@ -174,33 +208,30 @@ public class Main_BOJ_18809_Gaaaaaaaaaarden { // 제출일 2020-05-25 16:27 2835
 				for (int i = 0; i < 4; i++) {
 					nr = r + dr[i];
 					nc = c + dc[i];
-					if (nr >= 0 && nc >= 0 && nr < N && nc < M 
-							&& bmap[nr][nc] != 0 // 다음 방문 장소가 호수나 꽃이 아니어야 하고
+					if (nr >= 0 && nc >= 0 && nr < N && nc < M && bmap[nr][nc] != 0 // 다음 방문 장소가 호수나 꽃이 아니어야 하고
 							&& rmap[nr][nc] == 0) { // 기존에 방문한 적이 없어야 한다
 						rmap[nr][nc] = thisTurn; // 방문시간을 기록하고
-//						bmap[nr][nc] = 0; // 중복 방문을 제한한다
-						if(gmap[nr][nc] == thisTurn) { // 만약 green이 같은 시간에 뿌려졌을때
-							if(fmap[nr][nc] == 0) { // 꽃이 핀적이 없는 장소라면 
+						if (gmap[nr][nc] == thisTurn) { // 만약 green이 같은 시간에 뿌려졌을때
+							if (fmap[nr][nc] == 0) { // 꽃이 핀적이 없는 장소라면
 								fmap[nr][nc] = 1; // 꽃을 피운다
 								flower++;
-							}				
-						} else {							
-							rq.add(new Node(nr,nc)); // green과 연관이 없다면 새로운 전파장소로 등록한다
+							}
+						} else {
+							rq.add(new Node(nr, nc)); // green과 연관이 없다면 새로운 전파장소로 등록한다
 						}
-						
+
 					}
-				}				
+				}
 			}
-			
+
 			for (int i = 0; i < N; i++) {
 				for (int j = 0; j < M; j++) {
-					if(gmap[i][j] == thisTurn) {
-//						bmap[i][j] = 0;
+					if (gmap[i][j] == thisTurn) {
 						gq.add(new Node(i, j));
 					}
 				}
 			}
-			
+
 			thisTurn++;
 		}
 
