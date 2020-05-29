@@ -1,8 +1,9 @@
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.util.Arrays;
 
-public class Solution_D3_6808_규영이와인영이의카드게임 { // 제출일 2020-05-29 23:59 20,988 kb 2,133 ms
+// 최초 제출일 2020-05-29 23:59 20,988 kb 2,133 ms
+// 3차 제출일 2020-05-30 01:24 20,704 kb 993 ms
+public class Solution_D3_6808_규영이와인영이의카드게임 {
 
 	/**
 	 * https://www.geeksforgeeks.org/fast-io-in-java-in-competitive-programming/
@@ -54,69 +55,67 @@ public class Solution_D3_6808_규영이와인영이의카드게임 { // 제출�
 		}
 	}
 
-	static int[] a, b;
+	static final int CARD = 9;
+	static int[] a = new int[CARD];
+	static int[] b = new int[CARD];
+	static int[] fact = new int[CARD + 1];
 	static int win, lose;
-	static boolean[] visited = new boolean[9];
 
 	public static void main(String[] args) throws IOException {
 		Reader s = new Reader();
+
+		fact[0] = 1;
+		fact[1] = 1;
+		for (int i = 2; i <= CARD; i++) {
+			fact[i] = i * fact[i - 1];
+		}
 
 		int TC = s.nextInt();
 
 		for (int tc = 1; tc <= TC; tc++) {
 
-			int[] num = new int[19];
-			a = new int[9];
-			for (int i = 0; i < 9; i++) {
+			int[] num = new int[CARD << 1 + 1];
+
+			for (int i = 0; i < CARD; i++) {
 				a[i] = s.nextInt();
 				num[a[i]] = 1;
 			}
 
-			b = new int[9];
-			for (int i = 1, j = 0; i <= 18; i++) {
+			for (int i = 1, j = 0; i <= CARD << 1; i++) {
 				if (num[i] == 0) {
 					b[j++] = i;
 				}
 			}
 
-			Arrays.fill(visited, false);
-
 			win = 0;
 			lose = 0;
-			for (int i = 0; i < 9; i++) { // 첫타자
-				visited[i] = true;
-				dfs(0, 0, 0, b[i]);
-				visited[i] = false;
-			}
+			dfs(0, 0, 0, 0);
 
 			System.out.println(String.format("#%d %d %d", tc, win, lose));
 		}
 
 	}
 
-	private static void dfs(int step, int scoreA, int scoreB, int nextB) {
+	private static void dfs(int visited, int step, int scoreA, int scoreB) {
 
-		if (a[step] > nextB) {
-			scoreA += a[step] + nextB;
-		} else if (a[step] < nextB) {
-			scoreB += a[step] + nextB;
-		}
-
-		if (step == 8) {
-			// win lose 판단
-			if (scoreA > scoreB) {
-				win++;
-			} else if (scoreA < scoreB) {
-				lose++;
-			}
+		if (scoreA > (171 / 2)) {
+			win += fact[CARD - step];
+			return;
+		} else if (scoreB > (171 / 2)) {
+			lose += fact[CARD - step];
 			return;
 		}
 
-		for (int i = 0; i < 9; i++) {
-			if (!visited[i]) {
-				visited[i] = true;
-				dfs(step + 1, scoreA, scoreB, b[i]);
-				visited[i] = false;
+		for (int next = 0; next < CARD; next++) {
+			if ((visited & (1 << next)) == 0) {
+
+				int plus = a[step] + b[next];
+				if (a[step] > b[next]) {
+					dfs(visited | (1 << next), step + 1, scoreA + plus, scoreB);
+				} else if (a[step] < b[next]) {
+					dfs(visited | (1 << next), step + 1, scoreA, scoreB + plus);
+				}
+
 			}
 		}
 
