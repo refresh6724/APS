@@ -5,7 +5,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.StringTokenizer;
 
-public class Solution_D3_1217_거듭제곱 { // 제출일 2020-06-05 23:57 18,360 kb 113 ms
+public class Solution_D3_1217_거듭제곱 { // 제출일 2020-06-04 23:57 18,360 kb 113 ms
 	static StringBuilder sb = new StringBuilder();
 
 	public static void main(String[] args) throws IOException {
