@@ -1,53 +1,58 @@
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 
-public class Solution_D3_2805_농작물수확하기 { // 제출일 2019-08-09 17:45
+// 최초 제출일 2019-08-09 17:45 35,932 kb 194 ms
+// 개선 제출일 2020-06-09 23:49 19,880 kb 101 ms
 
-	public static Scanner sc = new Scanner(System.in);
-	// public static StringBuilder sb = new StringBuilder();
-	public static int Answer;
+public class Solution_D3_2805_농작물수확하기 {
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-		int T = Integer.parseInt(sc.nextLine());
-		for (int t = 1; t <= T; t++) {
-			Answer = 0;
-			int N = Integer.parseInt(sc.nextLine());
-			String[] tmp;
-			int[][] map = new int[N][N];
-			for (int row = 0; row < N; row++) {
-				tmp = sc.nextLine().split("");
-				for (int col = 0; col < N; col++) {
-					map[row][col] = Integer.parseInt(tmp[col]);
-				}
-			}
+	public static void main(String[] args) throws Exception {
 
-			if (N == 1) {
-				Answer = map[0][0];
-				System.out.printf("#%d %d\n", t, Answer);
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+		StringBuilder sb = new StringBuilder();
+
+		int T = Integer.parseInt(br.readLine());
+		for (int i = 1; i <= T; i++) {
+			int n = Integer.parseInt(br.readLine());
+			if (n == 1) {
+				sb.append('#').append(i).append(' ').append(Integer.parseInt(br.readLine())).append('\n');
 				continue;
 			}
-
-			for (int row = 0; row <= N / 2; row++) {
-				for (int col = 0; col <= N / 2; col++) {
-					if (row + col == N / 2) {
-						int rowT = row;
-						int colT = col;
-						while (rowT + colT < N + N / 2) {
-							Answer += map[rowT++][colT++];
-						}
-					} else if (row + col == N / 2 + 1) {
-						int rowT = row;
-						int colT = col;
-						while (rowT + colT < N + N / 2) {
-							Answer += map[rowT++][colT++];
-						}
-					}
+			int half = n >> 1;
+			int start = half;
+			int len = 1;
+			int ans = 0;
+			char[] a = new char[n];
+			for (int j = 0; j < n; j++) {
+				a = br.readLine().toCharArray();
+				for (int k = 0; k < len; k++) {
+					ans += a[start + k] - '0';
+				}
+				if (start-- == 0) { // start는 -1이 된다
+					break; // len은 그대로 n
+				} else {
+					len += 2;
 				}
 			}
-			// sb.append("#").append(t).append(" ").append(Answer);
-			System.out.printf("#%d %d\n", t, Answer);
-		} // test case end
-			// System.out.println(sb);
+			start = 1;
+			len = n - 2;
+			for (int j = 0; j < n; j++) {
+				a = br.readLine().toCharArray();
+				for (int k = 0; k < len; k++) {
+					ans += a[start + k] - '0';
+				}
+				if (start++ == half) { // start는 n이 된다
+					break;
+				} else {
+					len -= 2;
+				}
+			}
+			sb.append('#').append(i).append(' ').append(ans).append('\n');
+		}
+		bw.write(sb.toString());
+		bw.flush();
 	}
-
 }
