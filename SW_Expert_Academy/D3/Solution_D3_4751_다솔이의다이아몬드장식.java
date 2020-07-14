@@ -6,25 +6,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.StringTokenizer;
 
-// 최초 제출일 2020-07-13 23:31 102,284 kb 754 ms
-// 2차 제출일 2020-07-14 22:09 106,448 kb 428 ms
-// 3차 제출일 2020-07-14 22:23 31,824 kb 302 ms
-// 7차 제출일 2020-07-14 22:30 28,448 kb 252 ms
-public class Solution_D3_4698_테네스의특별한소수 {
+public class Solution_D3_4751_다솔이의다이아몬드장식 { // 제출일 2020-07-14 23:06 23,048 kb 119 ms
 
-	static boolean[] prime;
-
-	static void primecheck() {
-		prime = new boolean[1000001];
-		prime[0] = prime[1] = true;
-		for (int i = 2; i < 1000001; i++) {
-			if (!prime[i]) {
-				for (int j = i + i; j < 1000001; j += i) {
-					prime[j] = true;
-				}
-			}
-		}
-	}
 
 	public static void main(String[] args) throws Exception {
 
@@ -33,44 +16,41 @@ public class Solution_D3_4698_테네스의특별한소수 {
 		StringBuilder sb = new StringBuilder();
 		StringTokenizer st = null;
 
-		Reader s = new Reader();
+//		Reader s = new Reader();
 
-		// 1부터 100만까지의 소수를 미리 계산해 기록해 둘 경우 => int 4byte * 100만 = 4MB
-		primecheck();
-
-//		System.out.println(Arrays.toString(prime));
-
-//		int TC = Integer.parseInt(br.readLine());
-		int TC = s.nextInt();
+		int TC = Integer.parseInt(br.readLine());
+//		int TC = s.nextInt();
 //		testcase: 
 		for (int tc = 1; tc <= TC; tc++) {
-
-			sb.append('#').append(tc).append(' ');
-//			st = new StringTokenizer(br.readLine());
-
-			int special = s.nextInt();
-			int start = s.nextInt();
-			int end = s.nextInt();
-
-			int res = 0;
-			int a = 0;
-			int b = 0;
-			for (int i = start; i <= end; i++) {
-				if (!prime[i]) {
-					a = i;
-					while (a != 0) {
-						b = a % 10;
-						a = a / 10;
-						if (b == special) {
-							res++;
-							break;
-						}
-					}
-				}
+			
+			StringBuilder sb1 = new StringBuilder();
+			StringBuilder sb2 = new StringBuilder();
+			StringBuilder sb3 = new StringBuilder();
+			
+			char[] words = br.readLine().toCharArray();
+			int len = words.length;
+			
+			// 시작에 무조건 하나씩 
+			sb1.append('.');
+			sb2.append('.');
+			sb3.append('#');
+			
+			// 글자 개수만큼 동일 패턴 반복
+			for (int i = 0; i < len; i++) {
+				sb1.append(".#..");
+				sb2.append("#.#.");
+				sb3.append('.').append(words[i]).append('.').append('#');
 			}
-
-			sb.append(res).append('\n');
-
+			
+			sb1.append('\n');
+			sb2.append('\n');
+			sb3.append('\n');
+			
+			sb.append(sb1.toString());
+			sb.append(sb2.toString());
+			sb.append(sb3.toString());
+			sb.append(sb2.toString());
+			sb.append(sb1.toString());
 		}
 		bw.write(sb.toString());
 		bw.flush();
