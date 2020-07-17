@@ -1,30 +1,24 @@
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.StringTokenizer;
 
 // 기존 제출일 2019-07-17 10:55 25,892 kb 210 ms
-// 개선 제출일 2020-07-16 22:36 21,324 kb 167 ms
+// 2차 제출일 2020-07-16 22:36 21,324 kb 167 ms dfs
+// 3차 제출일 2020-07-17 05:09 25,936 kb 115 ms dp
 public class Solution_D3_5215_햄버거다이어트 {
 
-	static int N, L, ans;
-	static int[] score, calory;
+	static int N, L;
+	static int[] score;
 
 	public static void main(String[] args) throws Exception {
 
-		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 		StringBuilder sb = new StringBuilder();
-		StringTokenizer st = null;
 
 		Reader s = new Reader();
 
-//		int TC = Integer.parseInt(br.readLine());
 		int TC = s.nextInt();
-//		testcase: 
 		for (int tc = 1; tc <= TC; tc++) {
 
 			sb.append('#').append(tc).append(' ');
@@ -32,35 +26,23 @@ public class Solution_D3_5215_햄버거다이어트 {
 			// 특정 칼로리 이하 조합에서 최대 점수 찾기
 			N = s.nextInt(); // 재료 개수
 			L = s.nextInt(); // 칼로리 제한
-			score = new int[N];
-			calory = new int[N];
+			score = new int[L + 1]; // 해당 칼로리에서 가질 수 있는 가장 큰 값을 dp로 계산
 
+			int t, k;
 			for (int i = 0; i < N; i++) {
-				score[i] = s.nextInt();
-				calory[i] = s.nextInt();
+				t = s.nextInt();
+				k = s.nextInt();
+				for (int calSum = L; calSum >= k; calSum--) {
+					// L 칼로리부터 최소 k 칼로리까지
+					// 지금 i번째 재료가 들어갔을 때와 들어가지 않았을 때의 점수를 비교해 더 큰 값을 저장
+					score[calSum] = (score[calSum] > score[calSum - k] + t) ? score[calSum] : score[calSum - k] + t;
+				}
 			}
-			ans = 0;
-			dfs(0, 0, 0);
-			sb.append(ans).append('\n');
+			sb.append(score[L]).append('\n');
 
 		}
 		bw.write(sb.toString());
 		bw.flush();
-	}
-
-	private static void dfs(int idx, int cal, int sco) {
-
-		if (cal > L) {
-			return;
-		}
-
-		if (idx == N) {
-			ans = Math.max(ans, sco);
-			return;
-		}
-
-		dfs(idx + 1, cal, sco); // 선택하지 않은 경우
-		dfs(idx + 1, cal + calory[idx], sco + score[idx]);
 	}
 
 	/**
