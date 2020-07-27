@@ -7,27 +7,43 @@ import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.StringTokenizer;
 
-public class Solution_D3_5986_새샘이와세소수 { // 제출일 2020-07-26 23:55 19,908 kb 266 ms
-	
-	static boolean[] isPrime;
-	static int[] primeNum = new int[1000];
-	static int cnt;
+// 1차 제출일 2020-07-26 23:55 19,908 kb 266 ms dfs
+// 2차 제출일 2020-07-27 00:12 19,956 kb 115 ms dp
 
-	static void primecheck() {
-		cnt = 0;
-		isPrime = new boolean[1000];
-		isPrime[0] = isPrime[1] = true;
+public class Solution_D3_5986_새샘이와세소수 { 
+
+	static boolean[] isPrime = new boolean[1000];
+
+	static void primeCheck() {
+		Arrays.fill(isPrime, true);
+		isPrime[0] = isPrime[1] = false;
 		for (int i = 2; i < 1000; i++) {
-			if (!isPrime[i]) {
-				primeNum[cnt++] = i;
+			if (isPrime[i]) {
 				for (int j = i + i; j < 1000; j += i) {
-					isPrime[j] = true;
+					isPrime[j] = false;
 				}
 			}
 		}
-	}	
-	
-	
+	}
+
+	static int[] possibility = new int[1000];
+
+	static void tripleNum() { // 중복조합을 방지하기 위해 x<=y<=z 조건
+		for (int i = 2; i < 1000; i++) {
+			if (isPrime[i]) {
+				for (int j = i; i + j < 1000; j++) {
+					if (isPrime[j]) {
+						for (int k = j; i + j + k < 1000; k++) {
+							if (isPrime[k]) {
+								possibility[i + j + k]++;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
 	public static void main(String[] args) throws Exception {
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -36,8 +52,9 @@ public class Solution_D3_5986_새샘이와세소수 { // 제출일 2020-07-26 23
 		StringBuilder sb = new StringBuilder();
 
 		Reader s = new Reader();
-		primecheck();
-		
+		primeCheck();
+		tripleNum();
+
 //		int TC = Integer.parseInt(br.readLine());
 		int TC = s.nextInt();
 		for (int tc = 1; tc <= TC; tc++) {
@@ -46,38 +63,15 @@ public class Solution_D3_5986_새샘이와세소수 { // 제출일 2020-07-26 23
 
 			// 5보다 큰 홀수 N은 세 소수의 합으로 나타낼 수 있다
 			// 999까지 경우의 수 체크
-			
+
 			// 1. 999까지 소수를 체크한다
-			// 2. 홀수 N을 
-		
-			
-			sb.append(solve(s.nextInt(),0,0)).append('\n');
+			// 2. 모든 소수 조합의 경우에 대해서 3중 반복문으로 경우의 수를 체크한다
+
+			sb.append(possibility[s.nextInt()]).append('\n');
 
 		}
 		bw.write(sb.toString());
 		bw.flush();
-	}
-
-	private static int solve(int n, int idx, int depth) {
-		if (depth == 3) {
-            if (n == 0) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-         
-        int count = 0;
-         
-        for (int i = idx; i < cnt; i++) {
-            if (n >= primeNum[i]) {
-                count += solve(n - primeNum[i], i, depth + 1);
-            } else {
-                break;
-            }
-        }
-         
-        return count;
 	}
 
 	/**
