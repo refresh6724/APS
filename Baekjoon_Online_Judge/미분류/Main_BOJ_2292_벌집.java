@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- * https://www.acmicpc.net/problem/2839
+ * https://www.acmicpc.net/problem/2292
  */
 public class Main_BOJ_2292_벌집 { // 제출일 2020-10-30 23:31
 
