@@ -20,8 +20,8 @@ def solution1(n):
     
 def solution2(n):
     from string import digits
-    def f(n):
-        ls = list(digits)
+    ls = list(digits)
+    def f(n):        
         return ls[n] if n < 3 else f(n//3) + ls[n%3]        
     return int(str(f(n))[::-1], 3)
 
