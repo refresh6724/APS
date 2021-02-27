@@ -3,7 +3,7 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 
-public class Main_JO_2074_홀수마방진 { // 제출일 2021-02-27 20:02
+public class Main_JO_1495_대각선지그재그 { // 제출일 2021-02-27 20:15
 
 	static int n;
 	static int[][] arr;
@@ -13,7 +13,7 @@ public class Main_JO_2074_홀수마방진 { // 제출일 2021-02-27 20:02
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
 
-		n = Integer.parseInt(br.readLine()); // 2 ~ 100 사이의 홀수
+		n = Integer.parseInt(br.readLine()); // 1 ~ 100 사이의 정수
 		arr = new int[n][n];
 
 		fill();
@@ -24,26 +24,38 @@ public class Main_JO_2074_홀수마방진 { // 제출일 2021-02-27 20:02
 
 	private static void fill() {
 		int row = 0;
-		int col = n / 2;
+		int col = 0;
+		int dir = 0; // 0 : 좌하 1 : 우상
 		int num = 1;
 
+		// 좌하 방향으로 시작 1-1 좌하 1-2 하 1-3 우
+		// 우상 방향으로 시작 2-1 우상 2-2 우 1-4 하
+
 		while (num <= n * n) {
-			arr[row][col] = num;
-			if (num % n == 0) {
-				row += 1;
-			} else {
-				if (row == 0) {
-					row = n - 1;
-				} else {
-					row -= 1;
-				}
-				if (col == 0) {
-					col = n - 1;
-				} else {
+			arr[row][col] = num++;
+			if (dir == 0) {
+				if (row + 1 < n && col - 1 >= 0) {
+					row += 1;
 					col -= 1;
+				} else if (row + 1 < n) {
+					row += 1;
+					dir = 1;
+				} else {
+					col += 1;
+					dir = 1;
+				}
+			} else {
+				if (row - 1 >= 0 && col + 1 < n) {
+					row -= 1;
+					col += 1;
+				} else if (col + 1 < n) {
+					col += 1;
+					dir = 0;
+				} else {
+					row += 1;
+					dir = 0;
 				}
 			}
-			num += 1;
 		}
 	}
 
