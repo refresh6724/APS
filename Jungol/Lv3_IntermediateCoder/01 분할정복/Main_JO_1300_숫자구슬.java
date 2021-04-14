@@ -4,12 +4,10 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.StringTokenizer;
 
-// 
-public class Main_JO_1300_숫자구슬 { // 제출일 2021-04-14 23:50 60/100
+public class Main_JO_1300_숫자구슬 { // 제출일 2021-04-14 23:56
 
 	static int n, m, ans;
 	static int[] arr, sum, ansArr;
-	static boolean hasZero;
 
 	public static void main(String[] args) throws Exception {
 		input();
@@ -30,7 +28,6 @@ public class Main_JO_1300_숫자구슬 { // 제출일 2021-04-14 23:50 60/100
 		for (int i = 0; i < n; i++) {
 			arr[i] = Integer.parseInt(st.nextToken()); // 100 이하
 		}
-		hasZero = false;
 	}
 
 	private static void go() {
@@ -46,10 +43,19 @@ public class Main_JO_1300_숫자구슬 { // 제출일 2021-04-14 23:50 60/100
 			mid = (low + high) / 2;
 		}
 
-		if (hasZero) {
+		while (hasZero(ansArr)) {
 			prove();
 		}
 
+	}
+
+	private static boolean hasZero(int[] arr) {
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i] == 0) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	private static boolean split(int mid) {
@@ -73,9 +79,6 @@ public class Main_JO_1300_숫자구슬 { // 제출일 2021-04-14 23:50 60/100
 						ans = mid;
 						for (int i = 0; i < m; i++) {
 							ansArr[i] = sum[i];
-							if (ansArr[i] == 0) {
-								hasZero = true;
-							}
 						}
 					}
 					return true;
