@@ -50,7 +50,7 @@ public class Main_JO_1300_숫자구슬 { // 제출일 2021-04-14 23:56
 	}
 
 	private static boolean hasZero(int[] arr) {
-		for (int i = 0; i < arr.length; i++) {
+		for (int i = arr.length-1; i >= 0; i--) {
 			if (arr[i] == 0) {
 				return true;
 			}
