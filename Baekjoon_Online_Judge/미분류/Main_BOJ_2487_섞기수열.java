@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Main_JO_2255_섞기수열 { // 제출일 2021-04-29 18:43
+public class Main_BOJ_2487_섞기수열 { // 제출일 2021-04-29 18:17
 
 	static int n, max, ans;
 	static boolean[] visited;	
@@ -257,4 +257,5 @@ public class Main_JO_2255_섞기수열 { // 제출일 2021-04-29 18:43
 			din.close();
 		}
 	}
+
 }
