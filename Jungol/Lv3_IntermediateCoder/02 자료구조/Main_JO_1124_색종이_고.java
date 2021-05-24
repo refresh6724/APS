@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.StringTokenizer;
 
-public class Main_JO_1124_색종이_고 { // 제출일 2021-05-23 23:33
+public class Main_JO_1124_색종이_고 { // 제출일 2021-05-24 00:13
 
 	static int n, sum;
 	static int[][] board;
@@ -47,7 +47,7 @@ public class Main_JO_1124_색종이_고 { // 제출일 2021-05-23 23:33
 				}
 			}
 		}
-		
+
 //		debug();
 
 		// 누적이 끝났다면 다시 왼쪽(x좌표 0)부터 바닥에서 위로 올라가면서 높이를 카운팅한다
@@ -63,13 +63,20 @@ public class Main_JO_1124_색종이_고 { // 제출일 2021-05-23 23:33
 
 	private static void debug() {
 		StringBuilder sb = new StringBuilder();
+		sb.append("     x : ");
+		for (int j = 0; j < 100; j++) {
+			sb.append(String.format("%2d", j));
+		}
+		sb.append('\n');
+
 		for (int i = 99; i >= 0; i--) {
+			sb.append(String.format("y : %d  ", i));
 			for (int j = 0; j < 100; j++) {
 				sb.append(String.format("%2d", board[i][j]));
 			}
 			sb.append('\n');
 		}
-		System.out.println(sb.toString());		
+		System.out.println(sb.toString());
 	}
 
 	private static void up(int y, int x, int before, int height) {
@@ -78,10 +85,11 @@ public class Main_JO_1124_색종이_고 { // 제출일 2021-05-23 23:33
 			return;
 		}
 
-//		if(board[y][x] == 31) {
+//		테스트케이스 10번
+//		if(x == 70 && board[y][x] == 31) {
 //			System.out.println("debug");
 //		}
-		
+
 		if (board[y][x] == before) {
 			up(y + 1, x, before, height + 1);
 		} else if (board[y][x] < before) {
@@ -89,6 +97,13 @@ public class Main_JO_1124_색종이_고 { // 제출일 2021-05-23 23:33
 			up(y + 1, x, board[y][x], height + 1);
 		} else if (board[y][x] > before) {
 			// 매번 두 가지로 분화하여 진행하면 계속 2배로 증가하므로 작아지는 지점을 찾아 바로 계산
+			int start = y - 1;
+			while (start >= 0) {
+				if (board[start][x] < before) {
+					break;
+				}
+				start--;
+			}
 			int end = y + 1;
 			while (end < 100) {
 				if (board[end][x] < before) {
@@ -96,7 +111,7 @@ public class Main_JO_1124_색종이_고 { // 제출일 2021-05-23 23:33
 				}
 				end++;
 			}
-			sum = Math.max(sum, (end - y + height) * before);
+			sum = Math.max(sum, (end - start - 1) * before);
 			up(y + 1, x, board[y][x], 1);
 		}
 	}
