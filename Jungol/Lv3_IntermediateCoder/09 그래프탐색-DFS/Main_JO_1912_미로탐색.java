@@ -1,11 +1,5 @@
-import java.io.BufferedWriter;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.io.*;
+import java.util.*;
 
 // ver1 평범한 dfs : Runtime Error(20) stack over flow 
 // ver2 while + stack으로 전환 : Time Limit Exceed(50) max : 1847 ms
@@ -17,12 +11,13 @@ import java.util.PriorityQueue;
 // ver8 지역 변수를 정적 변수로 수정 : 위와 같음
 // ver9 ArrayList 정렬 시간을 줄이기 위해 PriorityQueue로 수정 : Time Limit Exceed(90) max : 1041 ms
 // ver10 stack을 배열과 sidx로 전환 : Time Limit Exceed(90) max : 1022 ms
+// ver11 클래스 import 부분을 *로 전환하고 주석을 제거 : Success(100) max : 940ms	
 
-public class Main_JO_1912_미로탐색 { // 제출일 2021-05-25 23:55
+public class Main_JO_1912_미로탐색 { // 제출일 2021-05-25 23:56
 
 	static int n, m, cnt, start, next, sidx;
 	static List<PriorityQueue<Integer>> graph;
-	static boolean[] visited, finished;
+	static boolean[] visited;
 	static int[] size, order, stk;
 
 	public static void main(String[] args) throws Exception {
@@ -46,12 +41,7 @@ public class Main_JO_1912_미로탐색 { // 제출일 2021-05-25 23:55
 			graph.get(start).add(next);
 			graph.get(next).add(start);
 		}
-//		// 낮은 번호부터 들리기 때문에 정렬해줘야 한다
-//		for (int i = 1; i <= n; i++) {
-//			Collections.sort(graph.get(i));
-//		}
 		visited = new boolean[n + 1];
-//		finished = new boolean[n + 1];
 		size = new int[n + 1];
 		for (int i = 1; i <= n; i++) {
 			size[i] = graph.get(i).size();
@@ -96,7 +86,6 @@ public class Main_JO_1912_미로탐색 { // 제출일 2021-05-25 23:55
 			int siz = size[start];
 			for (int idx = 0; idx < siz; idx++) {
 				next = graph.get(start).poll();
-//				next = graph.get(start).remove(0);
 				size[start]--;
 				if (!visited[next]) {
 					visited[next] = true;
@@ -107,13 +96,7 @@ public class Main_JO_1912_미로탐색 { // 제출일 2021-05-25 23:55
 					break;
 				}
 			}
-//			if (size[start] == 0) {
-//				finished[start] = true;
-//			}
 			start = stk[--sidx];
-//			if (finished[start]) {
-//				start = stk[--sidx];
-//			}
 		}
 	}
 
