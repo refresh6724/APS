@@ -3,36 +3,28 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.Arrays;
-import java.util.List;
 import java.util.PriorityQueue;
 
 // ver1 dfs 사용시 stack over flow Runtime Error(47) 610 ms
 // ver2 다익스트라 + 경로추적 Time Limit Exceed(94) max 1931 ms
 // ver3 리스트에서 배열로 변경 : 시간 변화 없음 Time Limit Exceed(94) max 1933 ms
+// ver4 모든 정점을 방문하는 것이 아니므로 다익스트라에서 모든 정점을 계산하는 것과 달리
+// 		경로를 저장할 필요도 없고 도착하는 곳이 바로 최단 경로이므로 dfs처럼 체크한다 Success(100) 366ms
 
-public class Main_JO_3230_두로봇 { // 제출일 2021-05-28 23:47
+public class Main_JO_3230_두로봇 { // 제출일 2021-05-29 00:17
 
 	static int n, a, b, ans;
-	static List<List<Node>> graph;
-	static Node[] graph3;
+	static Node[] graph;
 	static boolean[] visited;
-	static boolean find;
-	static int[] dist, from;
 
 	static class Node implements Comparable<Node> {
 		int dest;
 		int weight;
+		int max;
 		Node next;
 
 		public Node() {
 
-		}
-
-		public Node(int dest, int weight) {
-			super();
-			this.dest = dest;
-			this.weight = weight;
 		}
 
 		public Node(int dest, int weight, Node next) {
@@ -41,9 +33,15 @@ public class Main_JO_3230_두로봇 { // 제출일 2021-05-28 23:47
 			this.next = next;
 		}
 
+		public Node(int dest, int weight, int max) {
+			this.dest = dest;
+			this.weight = weight;
+			this.max = max;
+		}
+
 		@Override
-		public int compareTo(Node o) {
-			return o.weight - this.weight; // 최단 거리 찾기 이므로 최소힙
+		public int compareTo(Node o) { // 최소가 먼저 나오도록
+			return o.weight - this.weight;
 		}
 
 	}
@@ -60,11 +58,7 @@ public class Main_JO_3230_두로봇 { // 제출일 2021-05-28 23:47
 		n = fr.nextInt(); // 1 이상 10만 이하
 		a = fr.nextInt(); // 로봇 1 위치
 		b = fr.nextInt(); // 로봇 2 위치
-//		graph = new ArrayList<>(n + 1);
-//		for (int i = 0; i <= n; i++) {
-//			graph.add(new ArrayList<>());
-//		}
-		graph3 = new Node[n + 1];
+		graph = new Node[n + 1];
 
 		int u = 0;
 		int v = 0;
@@ -73,121 +67,35 @@ public class Main_JO_3230_두로봇 { // 제출일 2021-05-28 23:47
 			u = fr.nextInt();
 			v = fr.nextInt();
 			w = fr.nextInt(); // 각 통로의 길이는 1천을 넘지 않는다
-//			graph.get(u).add(new Node(v, w));
-//			graph.get(v).add(new Node(u, w));
-			graph3[u] = new Node(v, w, graph3[u]);
-			graph3[v] = new Node(u, w, graph3[v]);
+			graph[u] = new Node(v, w, graph[u]);
+			graph[v] = new Node(u, w, graph[v]);
 		}
 
 		visited = new boolean[n + 1];
-		find = false;
-		dist = new int[n + 1];
-		Arrays.fill(dist, Integer.MAX_VALUE);
-		from = new int[n + 1];
 	}
 
 	private static void go() {
 		// a와 b간의 전체 경로 길이를 구하고 그 중 가장 긴 부분의 길이를 뺀다
 		// a에서 dfs로 출발하여 매 이동시 가장 길었던 부분의 길이를 기록한다
 		// b에 도착하면 종료
-		visited[a] = true;
-//		dfs(a, 0, 0); 
-//		dijk();
-		dijk3();
-	}
-
-	private static void dijk3() {
-		int cnt = 0;
-		PriorityQueue<Node> pq = new PriorityQueue<>();
-		dist[a] = 0;
-		pq.add(new Node(a, 0));
-		while (!pq.isEmpty()) {
-			Node next = pq.poll();
-			visited[next.dest] = true;
-			for (Node adj = graph3[next.dest]; adj != null; adj = adj.next) {
-				if (!visited[adj.dest]) {
-					
-					if (dist[adj.dest] > dist[next.dest] + adj.weight) {
-						dist[adj.dest] = dist[next.dest] + adj.weight;
-						from[adj.dest] = next.dest;
-						pq.add(new Node(adj.dest, dist[adj.dest]));
-					}
-				}
-			}
-		}
-
-		// from으로 b에서 a로 역추적
-		int prev = 0;
-		int next = b;
-		int max = 0;
-		while (prev != a) {
-			prev = from[next];
-			for (Node path = graph3[prev]; path != null; path = path.next) {
-				if (path.dest == next) {
-					max = Math.max(max, path.weight);
-					break;
-				}
-			}
-			next = prev;
-		}
-		ans = dist[b] - max;
+		dijk();
 	}
 
 	private static void dijk() {
-
 		PriorityQueue<Node> pq = new PriorityQueue<>();
-		dist[a] = 0;
-		pq.add(new Node(a, 0));
+		pq.add(new Node(a, 0, 0)); // 위치, 거리합, 최대부분거리
 		while (!pq.isEmpty()) {
-			Node next = pq.poll();
-			visited[next.dest] = true;
-			for (Node adj : graph.get(next.dest)) {
-				if (!visited[adj.dest]) {
-					if (dist[adj.dest] > dist[next.dest] + adj.weight) {
-						dist[adj.dest] = dist[next.dest] + adj.weight;
-						from[adj.dest] = next.dest;
-						pq.add(new Node(adj.dest, dist[adj.dest]));
-					}
-				}
+			Node node = pq.poll();
+			int p = node.dest;
+			visited[p] = true;
+			if (p == b) {
+				ans = node.weight - node.max;
+				return;
 			}
-		}
-
-		// from으로 b에서 a로 역추적
-		int prev = 0;
-		int next = b;
-		int max = 0;
-		while (prev != a) {
-			prev = from[next];
-			for (Node path : graph.get(prev)) {
-				if (path.dest == next) {
-					max = Math.max(max, path.weight);
-					break;
+			for (Node next = graph[p]; next != null; next = next.next) {
+				if (!visited[next.dest]) {
+					pq.add(new Node(next.dest, node.weight + next.weight, Math.max(node.max, next.weight)));
 				}
-			}
-			next = prev;
-		}
-		ans = dist[b] - max;
-	}
-
-	private static void dfs(int now, int max, int sum) {
-		if (find) {
-			return;
-		}
-
-		if (now == b) {
-			ans = sum - max;
-			find = true;
-			return;
-		}
-
-		for (Node next : graph.get(now)) {
-			if (!visited[next.dest]) {
-				visited[next.dest] = true;
-				dfs(next.dest, Math.max(max, next.weight), sum + next.weight);
-				if (find) {
-					return;
-				}
-				visited[next.dest] = false;
 			}
 		}
 	}
