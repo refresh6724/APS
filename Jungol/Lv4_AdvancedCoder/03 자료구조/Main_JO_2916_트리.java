@@ -1,47 +1,37 @@
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.InputStreamReader;
+import java.io.DataInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.StringTokenizer;
- 
-// 1차 시도 TLE(20) / 147,240 kb / max : 2907 ms / mean : 1080 ms
-public class Main { // 제출일 2021-07-11 23:59
+
+// 2차 시도 TLE(85) / 146,572 kb / max : 2894 ms / mean : 962 ms
+// 변경점 : FastReader 사용, 논리 오류 수정(디버깅), 변수 정리, 최적화
+public class Main { // 제출일 2021-07-12 00:10
  
     static int n, k;
     static int[] parent, color;
     static boolean[] visited;
  
     public static void main(String[] args) throws Exception {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringTokenizer st = null;
  
+        FastReader fr = new FastReader();
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         StringBuilder sb = new StringBuilder();
  
-        st = new StringTokenizer(br.readLine());
-        n = Integer.parseInt(st.nextToken());// 노드 개수 5 이상 10만 이하
-        k = Integer.parseInt(st.nextToken());// 연산 개수 1 이상 30만 이하
-        // 연산 1이면 paint, 2면 move, 3이면 count
-        // n개의 노드로 구성된 트리
-        // 0번 노드가 루트, 나머지 1~n-1번 노드의 부모는 0번, 모든 에지의 색깔은 0
-        // 또한, paint와 count 연산 시 a번 노드와 b번 노드사이의 최단경로의 길이는 항상 1,000 이하이다.
-        // 모든 count 연산에 대해 결과값을 출력
- 
-        // LCA를 응용해서 최단거리를 구한다면 nlogn + 쿼리당 logn 10만*400 + 30만*400 = 1억??
-        // move 한번이면 lca를 다시 그려야 한다
+        n = fr.nextInt(); // 노드 개수 5 이상 10만 이하
+        k = fr.nextInt();// 연산 개수 1 이상 30만 이하     
  
         int r, a, b, c;
         parent = new int[n];
         color = new int[n];
         for (int i = 1; i <= k; i++) {
-            st = new StringTokenizer(br.readLine());
-            r = Integer.parseInt(st.nextToken());
-            a = Integer.parseInt(st.nextToken());
-            b = Integer.parseInt(st.nextToken());
+            r = fr.nextInt();
+            a = fr.nextInt();
+            b = fr.nextInt();
             if (r == 1) {
-                c = Integer.parseInt(st.nextToken());
+                c = fr.nextInt();
                 paint(a, b, c);
             } else if (r == 2) {
                 move(a, b);
@@ -51,40 +41,21 @@ public class Main { // 제출일 2021-07-11 23:59
         }
         bw.write(sb.toString());
         bw.flush();
- 
+        bw.close(); 
     }
  
     private static int count(int a, int b) {
-        if (a == b) {
-            return 1;
-        }
+ 
         Set<Integer> colorSet = new HashSet<Integer>();
-        visited = new boolean[n];
-        int keep = a;
-        int cnt = 0;
- 
-        // a를 위로 올라가며 visited 체크
-        while (a != 0 && cnt < 1000) {
-            visited[a] = true;
+        int lca = getlca(a, b);
+        while (a != lca) {
+            colorSet.add(color[a]);
             a = parent[a];
-            cnt++;
         }
-        cnt = 0;
-        // b를 위로 올라가며 a와 lca 찾기
-        while (b != 0 && cnt < 1000) {
+        while (b != lca) {
             colorSet.add(color[b]);
-            if (visited[b]) {
-                break;
-            }
             b = parent[b];
-            cnt++;
         }
-        // lca를 찾았다면 a를 다시 위로 올라가며 색칠
-        while (keep != 0 && keep != b) {
-            colorSet.add(color[keep]);
-            keep = parent[keep];
-        }
- 
         return colorSet.size();
     }
  
@@ -93,35 +64,150 @@ public class Main { // 제출일 2021-07-11 23:59
     }
  
     private static void paint(int a, int b, int c) {
+        int lca = getlca(a, b);
+        while (a != lca) {
+            color[a] = c;
+            a = parent[a];
+        }
+        while (b != lca) {
+            color[b] = c;
+            b = parent[b];
+        }
+    }
+ 
+    private static int getlca(int a, int b) {
         if (a == b) {
-            return;
+            return a;
         }
         visited = new boolean[n];
-        int keep = a;
         int cnt = 0;
-        // a를 위로 올라가며 visited 체크
-        // 0은 칠하지 않고 숫자를 세지도 않는다
         while (a != 0 && cnt < 1000) {
             visited[a] = true;
             a = parent[a];
             cnt++;
         }
         cnt = 0;
-        // b를 위로 올라가며 a와 lca 찾기
         while (b != 0 && cnt < 1000) {
-            color[b] = c;
             if (visited[b]) {
-                break;
+                return b;
             }
             b = parent[b];
-            cnt++;
         }
-        // lca를 찾았다면 a를 다시 위로 올라가며 색칠
-        while (keep != 0 && keep != b) {
-            color[keep] = c;
-            keep = parent[keep];
+        return 0;
+    }
+ 
+    // https://www.geeksforgeeks.org/fast-io-in-java-in-competitive-programming/
+    // 4.Using Reader Class:
+ 
+    static class FastReader {
+        final private int BUFFER_SIZE = 1 << 16;
+        private DataInputStream din;
+        private byte[] buffer;
+        private int bufferPointer, bytesRead;
+ 
+        public FastReader() {
+            din = new DataInputStream(System.in);
+            buffer = new byte[BUFFER_SIZE];
+            bufferPointer = bytesRead = 0;
         }
-        return;
+ 
+        public FastReader(String file_name) throws IOException {
+            din = new DataInputStream(new FileInputStream(file_name));
+            buffer = new byte[BUFFER_SIZE];
+            bufferPointer = bytesRead = 0;
+        }
+ 
+        public String readLine() throws IOException {
+            byte[] buf = new byte[64]; // line length
+            int cnt = 0, c;
+            while ((c = read()) != -1) {
+                if (c == '\n') {
+                    if (cnt != 0) {
+                        break;
+                    } else {
+                        continue;
+                    }
+                }
+                buf[cnt++] = (byte) c;
+            }
+            return new String(buf, 0, cnt);
+        }
+ 
+        public int nextInt() throws IOException {
+            int ret = 0;
+            byte c = read();
+            while (c <= ' ') {
+                c = read();
+            }
+            boolean neg = (c == '-');
+            if (neg)
+                c = read();
+            do {
+                ret = ret * 10 + c - '0';
+            } while ((c = read()) >= '0' && c <= '9');
+ 
+            if (neg)
+                return -ret;
+            return ret;
+        }
+ 
+        public long nextLong() throws IOException {
+            long ret = 0;
+            byte c = read();
+            while (c <= ' ')
+                c = read();
+            boolean neg = (c == '-');
+            if (neg)
+                c = read();
+            do {
+                ret = ret * 10 + c - '0';
+            } while ((c = read()) >= '0' && c <= '9');
+            if (neg)
+                return -ret;
+            return ret;
+        }
+ 
+        public double nextDouble() throws IOException {
+            double ret = 0, div = 1;
+            byte c = read();
+            while (c <= ' ')
+                c = read();
+            boolean neg = (c == '-');
+            if (neg)
+                c = read();
+ 
+            do {
+                ret = ret * 10 + c - '0';
+            } while ((c = read()) >= '0' && c <= '9');
+ 
+            if (c == '.') {
+                while ((c = read()) >= '0' && c <= '9') {
+                    ret += (c - '0') / (div *= 10);
+                }
+            }
+ 
+            if (neg)
+                return -ret;
+            return ret;
+        }
+ 
+        private void fillBuffer() throws IOException {
+            bytesRead = din.read(buffer, bufferPointer = 0, BUFFER_SIZE);
+            if (bytesRead == -1)
+                buffer[0] = -1;
+        }
+ 
+        private byte read() throws IOException {
+            if (bufferPointer == bytesRead)
+                fillBuffer();
+            return buffer[bufferPointer++];
+        }
+ 
+        public void close() throws IOException {
+            if (din == null)
+                return;
+            din.close();
+        }
     }
  
 }
