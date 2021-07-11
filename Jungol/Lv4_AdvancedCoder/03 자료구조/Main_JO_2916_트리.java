@@ -6,9 +6,9 @@ import java.io.OutputStreamWriter;
 import java.util.HashSet;
 import java.util.Set;
 
-// 2차 시도 TLE(85) / 146,572 kb / max : 2894 ms / mean : 962 ms
-// 변경점 : FastReader 사용, 논리 오류 수정(디버깅), 변수 정리, 최적화
-public class Main { // 제출일 2021-07-12 00:10
+// 3차 시도 TLE(90) / 79,468 kb / max : 2901 ms / mean : 522 ms
+// 변경점 : 루트가 0으로 고정되어 있다는 점을 이용해 매번 깊이를 계산, getlca를 많이 호출하는 테스트케이스에 약함
+public class Main { // 제출일 2021-07-12 00:15
  
     static int n, k;
     static int[] parent, color;
@@ -21,7 +21,7 @@ public class Main { // 제출일 2021-07-12 00:10
         StringBuilder sb = new StringBuilder();
  
         n = fr.nextInt(); // 노드 개수 5 이상 10만 이하
-        k = fr.nextInt();// 연산 개수 1 이상 30만 이하     
+        k = fr.nextInt();// 연산 개수 1 이상 30만 이하       
  
         int r, a, b, c;
         parent = new int[n];
@@ -44,8 +44,7 @@ public class Main { // 제출일 2021-07-12 00:10
         bw.close(); 
     }
  
-    private static int count(int a, int b) {
- 
+    private static int count(int a, int b) {		
         Set<Integer> colorSet = new HashSet<Integer>();
         int lca = getlca(a, b);
         while (a != lca) {
@@ -76,26 +75,40 @@ public class Main { // 제출일 2021-07-12 00:10
     }
  
     private static int getlca(int a, int b) {
-        if (a == b) {
-            return a;
-        }
-        visited = new boolean[n];
-        int cnt = 0;
-        while (a != 0 && cnt < 1000) {
-            visited[a] = true;
-            a = parent[a];
-            cnt++;
-        }
-        cnt = 0;
-        while (b != 0 && cnt < 1000) {
-            if (visited[b]) {
-                return b;
+ 
+        int a_depth = get_depth(a);
+        int b_depth = get_depth(b);
+ 
+        if (a_depth > b_depth) {
+            while (a_depth != b_depth) {
+                a_depth--;
+                a = parent[a];
             }
+        } else if (a_depth < b_depth) {
+            while (a_depth != b_depth) {
+                b_depth--;
+                b = parent[b];
+            }
+        }
+ 
+        while (a != b) {
+            a = parent[a];
             b = parent[b];
         }
-        return 0;
+ 
+        return a;
     }
  
+    private static int get_depth(int x) {
+        int cnt = 0;
+        while (x != 0) {
+            cnt++;
+            x = parent[x];
+        }
+        return cnt;
+    }
+     
+  
     // https://www.geeksforgeeks.org/fast-io-in-java-in-competitive-programming/
     // 4.Using Reader Class:
  
