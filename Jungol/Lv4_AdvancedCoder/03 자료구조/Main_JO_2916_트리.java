@@ -7,9 +7,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 // KOI 2015 중등부 3번 / JO 2916 / BOJ 10838
-// 5차 시도 TLE(95) / 46,821 kb / max : 2444 ms / mean : 420 ms
-// 변경점 : 시간과 메모리를 많이 먹는 set을 hashtable로 변경
-public class Main { // 제출일 2021-07-12 23:44
+// 6차 시도 Success(100) / 42,018 kb / max : 1955 ms / mean : 381 ms
+// 변경점 : getlca 함수 최적화(알고리즘은 그대로)
+public class Main { // 제출일 2021-07-13 02:30
 
 	static int n, k, cnt;
 	static int[] parent, color, visited;
@@ -28,7 +28,6 @@ public class Main { // 제출일 2021-07-12 23:44
 		k = fr.nextInt(); // 연산 개수 1 이상 30만 이하
 		cnt = 0;
 
-		int r, a, b, c;
 		parent = new int[n];
 		parent[0] = -1;
 		color = new int[n];
@@ -39,6 +38,7 @@ public class Main { // 제출일 2021-07-12 23:44
 		map = new HashMap<>();
 		map.put(0, coloridx++);
 
+		int r, a, b, c;
 		for (int i = 1; i <= k; i++) {
 			r = fr.nextInt();
 			a = fr.nextInt();
@@ -62,13 +62,11 @@ public class Main { // 제출일 2021-07-12 23:44
 			return 0;
 		}
 
-//      Set<Integer> colorSet = new HashSet<Integer>();
 		int colorSet = 0;
 		int tempcolor = 0;
 		coloridx++;
 		int lca = getlca(a, b);
 		while (a != lca) {
-//          colorSet.add(color[a]);
 			tempcolor = color[a];
 			if (colortable[tempcolor] != coloridx) {
 				colortable[tempcolor] = coloridx;
@@ -77,7 +75,6 @@ public class Main { // 제출일 2021-07-12 23:44
 			a = parent[a];
 		}
 		while (b != lca) {
-//          colorSet.add(color[b]);
 			tempcolor = color[b];
 			if (colortable[tempcolor] != coloridx) {
 				colortable[tempcolor] = coloridx;
@@ -85,7 +82,6 @@ public class Main { // 제출일 2021-07-12 23:44
 			}
 			b = parent[b];
 		}
-//      return colorSet.size();
 		return colorSet;
 	}
 
@@ -118,18 +114,17 @@ public class Main { // 제출일 2021-07-12 23:44
 	}
 
 	private static int getlca(int a, int b) {
-
 		cnt++;
 		int limit = 0;
-		while (a != 0 && limit < 1000) {
-			visited[a] = cnt;
+		visited[a] = cnt;
+		while (limit++ < 1000) {
 			a = parent[a];
-			limit++;
-		}
-		while (b != 0) {
-			if (visited[b] == cnt) {
+			if (a == -1) {
 				break;
 			}
+			visited[a] = cnt;
+		}
+		while (visited[b] != cnt) {
 			b = parent[b];
 		}
 		return b;
