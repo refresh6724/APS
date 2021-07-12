@@ -9,7 +9,7 @@ import java.util.Map;
 // KOI 2015 중등부 3번 / JO 2916 / BOJ 10838
 // 7차 시도 Success(100) / 38,423 kb / max : 1463 ms / mean : 337 ms
 // 변경점 : getlca 함수 알고리즘 변경
-public class Main_JO_2916_트리 { // 제출일 2021-07-13 04:09
+public class Main_BOJ_10838_트리 { // 제출일 2021-07-13 04:09
 
 	static int n, k, cnt;
 	static int[] parent, color, visited;
