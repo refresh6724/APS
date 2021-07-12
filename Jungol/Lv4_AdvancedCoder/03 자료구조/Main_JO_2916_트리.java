@@ -3,20 +3,20 @@ import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
-// 4차 시도 TLE(60) / 121,256 kb / max : 2906 ms / mean : 1241 ms
-// 변경점 : getlca의 시간복잡도를 logn으로 줄이기 위해 2차원배열 parent2를 추가, 깊이 관리를 위해 tree를 추가하고 move 함수에서 depth 계산
-public class Main { // 제출일 2021-07-12 01:01
+// KOI 2015 중등부 3번 / JO 2916 / BOJ 10838
+// 5차 시도 TLE(95) / 46,821 kb / max : 2444 ms / mean : 420 ms
+// 변경점 : 시간과 메모리를 많이 먹는 set을 hashtable로 변경
+public class Main { // 제출일 2021-07-12 23:44
 
-	static int n, k;
-	static List<Set<Integer>> tree;
-	static int[] parent, color, depth;
-	static int[][] parent2;
+	static int n, k, cnt;
+	static int[] parent, color, visited;
+	// hash 사용
+	static int coloridx;
+	static int[] colortable;
+	static Map<Integer, Integer> map;
 
 	public static void main(String[] args) throws Exception {
 
@@ -26,43 +26,31 @@ public class Main { // 제출일 2021-07-12 01:01
 
 		n = fr.nextInt(); // 노드 개수 5 이상 10만 이하
 		k = fr.nextInt(); // 연산 개수 1 이상 30만 이하
+		cnt = 0;
 
-		tree = new ArrayList<>(n);
-		for (int i = 0; i < n; i++) {
-			tree.add(new HashSet<>());
-		}
-		for (int i = 1; i < n; i++) {
-			tree.get(0).add(i);
-		}
-
-		int r, a, b, c, prev;
+		int r, a, b, c;
 		parent = new int[n];
+		parent[0] = -1;
 		color = new int[n];
-		depth = new int[n];
-		Arrays.fill(depth, 1);
-		depth[0] = 0;
-		parent2 = new int[n][11];
+		visited = new int[n];
 
-		prev = 0;
+		coloridx = 0;
+		colortable = new int[300001];
+		map = new HashMap<>();
+		map.put(0, coloridx++);
+
 		for (int i = 1; i <= k; i++) {
 			r = fr.nextInt();
 			a = fr.nextInt();
 			b = fr.nextInt();
 			if (r == 1) {
-				if (prev == 2) {
-					findParent();
-				}
 				c = fr.nextInt();
 				paint(a, b, c);
 			} else if (r == 2) {
 				move(a, b);
 			} else if (r == 3) {
-				if (prev == 2) {
-					findParent();
-				}
 				sb.append(count(a, b)).append('\n');
 			}
-			prev = r;
 		}
 		bw.write(sb.toString());
 		bw.flush();
@@ -70,81 +58,81 @@ public class Main { // 제출일 2021-07-12 01:01
 	}
 
 	private static int count(int a, int b) {
+		if (a == b) {
+			return 0;
+		}
 
-		Set<Integer> colorSet = new HashSet<Integer>();
+//      Set<Integer> colorSet = new HashSet<Integer>();
+		int colorSet = 0;
+		int tempcolor = 0;
+		coloridx++;
 		int lca = getlca(a, b);
 		while (a != lca) {
-			colorSet.add(color[a]);
+//          colorSet.add(color[a]);
+			tempcolor = color[a];
+			if (colortable[tempcolor] != coloridx) {
+				colortable[tempcolor] = coloridx;
+				colorSet++;
+			}
 			a = parent[a];
 		}
 		while (b != lca) {
-			colorSet.add(color[b]);
+//          colorSet.add(color[b]);
+			tempcolor = color[b];
+			if (colortable[tempcolor] != coloridx) {
+				colortable[tempcolor] = coloridx;
+				colorSet++;
+			}
 			b = parent[b];
 		}
-		return colorSet.size();
+//      return colorSet.size();
+		return colorSet;
 	}
 
 	private static void move(int a, int b) {
-		// move Subtree
-		// 원래 a의 부모 p 에서 a를 제거하고 b에 a를 추가하고 깊이를 재계산
-		tree.get(parent[a]).remove(a);
-		tree.get(b).add(a);
 		parent[a] = b;
-		dfs(a, depth[b] + 1);
-	}
-
-	private static void dfs(int a, int d) {
-		depth[a] = d;
-		for (int child : tree.get(a)) {
-			dfs(child, d + 1);
-		}
-	}
-
-	private static void findParent() {
-		for (int i = 1; i < n; i++) {
-			parent2[i][0] = parent[i];
-		}
-
-		for (int j = 1; j < 11; j++) {
-			for (int i = 1; i < n; i++) {
-				parent2[i][j] = parent2[parent2[i][j - 1]][j - 1];
-			}
-		}
 	}
 
 	private static void paint(int a, int b, int c) {
+		if (a == b) {
+			return;
+		}
+
+		int tempcolor = 0;
+		if (map.get(c) != null) {
+			tempcolor = map.get(c);
+		} else {
+			map.put(c, coloridx);
+			tempcolor = coloridx++;
+		}
+
 		int lca = getlca(a, b);
 		while (a != lca) {
-			color[a] = c;
+			color[a] = tempcolor;
 			a = parent[a];
 		}
 		while (b != lca) {
-			color[b] = c;
+			color[b] = tempcolor;
 			b = parent[b];
 		}
 	}
 
 	private static int getlca(int a, int b) {
-		if (depth[a] > depth[b]) {
-			int tmp = a;
-			a = b;
-			b = tmp;
+
+		cnt++;
+		int limit = 0;
+		while (a != 0 && limit < 1000) {
+			visited[a] = cnt;
+			a = parent[a];
+			limit++;
 		}
-		for (int i = 10; i >= 0; i--) {
-			if (depth[b] - depth[a] >= (1 << i)) {
-				b = parent2[b][i];
+		while (b != 0) {
+			if (visited[b] == cnt) {
+				break;
 			}
+			b = parent[b];
 		}
-		if (a == b) {
-			return a;
-		}
-		for (int i = 10; i >= 0; i--) {
-			if (parent2[a][i] != parent2[b][i]) {
-				a = parent2[a][i];
-				b = parent2[b][i];
-			}
-		}
-		return parent2[a][0];
+		return b;
 	}
 
 	// https://www.geeksforgeeks.org/fast-io-in-java-in-competitive-programming/
