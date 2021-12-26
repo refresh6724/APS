@@ -70,3 +70,107 @@ Any R is in 2NF, if every non-key (or non-prime) attribute is fully functionally
 Hence, the given R is in 2NF.
 ```
 
+
+# #6
+
+Q. 영화 데이터베이스에 영화, 고객, 대여 테이블이 있을 때 가능한 최대 정규형은?
+
+```
+Relations (The key is CAPITALIZED):
+customer(name,addr,MEMBERNO)
+movie(DESCRIPTION,director,serialno)
+borrow(memberno,DATE,SERIALNO)
+
+Determinants:
+description->director,serialno
+serialno->description
+serialno->director
+name,addr -> memberno
+memberno -> name,addr
+serialno,date -> memberno
+```
+
+A. 2
+
+# #7
+
+Q. 6번 변형
+
+```
+Relations:
+movie(DESCRIPTION,serialno)
+serial(SERIALNO,director)
+customer(name,addr,MEMBERNO)
+borrow(memberno,DATE,SERIALNO)
+
+Determinants:
+description->director,serialno
+serialno->description
+serialno->director
+name,addr -> memberno
+memberno -> name,addr
+serialno,date -> memberno
+```
+
+A. 3.5
+
+# #8
+
+Q. 다음 중 non-key dependency 인 것은?
+
+```
+Relations (The key is CAPITALIZED):
+customer(name,addr,MEMBERNO)
+movie(DESCRIPTION,director,serialno)
+borrow(memberno,DATE,SERIALNO)
+
+1.  description->director,serialno
+2.  serialno->description
+3.  serialno->director
+4.  name,addr -> memberno
+5.  memberno -> name,addr
+6.  serialno,date -> memberno
+```
+
+A. 3
+
+# #9
+
+Q. R(a, b, c, d, e) (a, b는 primary key) 에서 non-candidate key(후보키가 아닌것)는?
+
+```
+1. a,c -> b,d,e
+2. a,d -> b
+3. a,c,e -> b,d
+```
+
+A. 2
+
+# #10
+
+Q. 주어진 테이블을 4정규형으로 분해하면 N행 2열의 테이블 2개가 된다. N은?
+
+```
+Restaurant  Crust       Delivery Area
+-------------------------------------------
+X Pizza     Thick       Whitefield
+X Pizza     Thick       Greenville
+X Pizza     Thick       Capital
+X Pizza     Stuffed     Whitefield
+X Pizza     Stuffed     Greenville
+X Pizza     Stuffed     Capital
+Papa Pizza  Thin        Capital
+Papa Pizza  Stuffed     Capital
+F1 Pizza    Thick       Whitefield
+F1 Pizza    Thick       Greenville
+F1 Pizza    Thin        Whitefield
+F1 Pizza    Thin        Greenville
+```
+
+
+A. 6
+
+해설
+https://en.wikipedia.org/wiki/Fourth_normal_form
+
+
